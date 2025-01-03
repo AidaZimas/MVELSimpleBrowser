@@ -1,81 +1,48 @@
 package com.teliasonera.mts.mvelsimple;
 
+import org.mvel2.templates.TemplateError;
 import org.mvel2.templates.TemplateRuntime;
-import java.util.*;
+import org.mvel2.templates.TemplateRuntime;
+
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Map;
+import java.util.Set;
 
 public class MVELTemplateTest {
+
     public static void main(String[] args) {
-        // MVEL template as a string
-        String template = "@if{rowsForOffering.size > 0}\n" +
-                "<div>\n" +
-                "    <div class=\"fieldset\">\n" +
-                "        <div>\n" +
-                "            <div class=\"main\" style=\"width: 972px;\">\n" +
-                "                <div class=\"service-box-wider\" style=\"margin-left:0;\">\n" +
-                "                    <div class=\"subcaption\">Abonnement</div>\n" +
-                "                </div>\n" +
-                "                <div class=\"service-box\">\n" +
-                "                    <div class=\"subcaption\">Pris per måned</div>\n" +
-                "                </div>\n" +
-                "            </div>\n" +
-                "            <div class=\"clear\"><!----></div>\n" +
-                "        </div>\n" +
-                "        @foreach{ offeringRow : rowsForOffering}\n" +
-                "        <div>\n" +
-                "            <div class=\"main\" style=\"width: 972px;\">\n" +
-                "                <div class=\"service-box-wider\" style=\"margin-left:0;\">\n" +
-                "                    <div class=\"data\">\n" +
-                "                        @if{offeringRow[\"offRowIsAdditionalText\"] == \"true\"}\n" +
-                "                            <i>@{offeringRow[\"offRowText\"]}</i>\n" +
-                "                        @else{}\n" +
-                "                            @{offeringRow[\"offRowText\"]}\n" +
-                "                        @end{}\n" +
-                "                    </div>\n" +
-                "                </div>\n" +
-                "                <div class=\"service-box\">\n" +
-                "                    <div class=\"data\">\n" +
-                "                        @if{offeringRow[\"offRowIsAdditionalText\"] == \"true\"}\n" +
-                "                            <i>@{offeringRow[\"offRowValue\"]}</i>\n" +
-                "                        @else{}\n" +
-                "                            @{offeringRow[\"offRowValue\"]}\n" +
-                "                        @end{}\n" +
-                "                    </div>\n" +
-                "                </div>\n" +
-                "            </div>\n" +
-                "            <div class=\"clear\"><!----></div>\n" +
-                "        </div>\n" +
-                "        @end{}\n" +
-                "        <div class=\"service-box-wider\" style=\"margin-left:0; width: 80%;\">\n" +
-                "            <div class=\"subcaption\" style=\"font-weight: bold; text-decoration: underline; margin-left:70%\">\n" +
-                "                <div><b>Minste totalpris&nbsp;&nbsp;Å betale per måned</b></div>\n" +
-                "                <div><b>@{minimumTotalPrice}&nbsp;;&nbsp;@{pricePerMonth}</b></div>\n" +
-                "            </div>\n" +
-                "        </div>\n" +
-                "    </div>\n" +
-                "</div>\n" +
-                "@end{}";
+        // Enable MVEL debugging
+        System.setProperty("mvel.debug", "true");
+        System.setProperty("mvel.debugger", "true");
 
-        // Test data
-        Map<String, Object> data = new HashMap<>();
-        List<Map<String, String>> rowsForOffering = new ArrayList<>();
-        Map<String, String> row1 = new HashMap<>();
-        row1.put("offRowIsAdditionalText", "true");
-        row1.put("offRowText", "Sample Text 1");
-        row1.put("offRowValue", "Value 1");
-        rowsForOffering.add(row1);
+        try {
+            // Path to the template file
+            String templatePath = "C:\\Users\\aida.zimas\\IdeaProjects\\document-manager-config\\src\\main\\resources\\templates\\netcom\\b2c\\order_contract_v4.html";
 
-        Map<String, String> row2 = new HashMap<>();
-        row2.put("offRowIsAdditionalText", "false");
-        row2.put("offRowText", "Sample Text 2");
-        row2.put("offRowValue", "Value 2");
-        rowsForOffering.add(row2);
+            // Read the template file content
+            String template = new String(Files.readAllBytes(Paths.get(templatePath)));
 
-        data.put("rowsForOffering", rowsForOffering);
-        data.put("minimumTotalPrice", "100.00");
-        data.put("pricePerMonth", "10.00");
+            // Analyze the template to extract expressions
+            Set<String> expressions = TemplateAnalyzer.analyzeTemplate(template);
 
-        // Render template
-        String result = (String) TemplateRuntime.eval(template, data);
-        System.out.println(result);
+            // Generate mock data based on extracted expressions
+            Map<String, Object> data = DataGenerator.generateData(expressions);
+
+            // Log the generated data
+            System.out.println("Generated Mock Data:");
+            data.forEach((key, value) -> {
+                System.out.println("Key: " + key + " | Value: " + value);
+            });
+
+            // Render the template with the generated data
+            String result = (String) TemplateRuntime.eval(template, data);
+
+            // Print the rendered output
+            System.out.println("\nRendered Output:\n" + result);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
