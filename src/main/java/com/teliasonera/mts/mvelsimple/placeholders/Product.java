@@ -13,12 +13,14 @@ public class Product extends Document {
     private int monthlyChargeInVat;
     private final MonthlyDiscount monthlyDiscount = new MonthlyDiscount();
     private int lifeTime;
+    private ProductAction action;
 
     public Product() {
         serviceClass = ServiceClass.SERVICE;
         name = SERVICE_NAMES.get(RANDOM.nextInt(SERVICE_NAMES.size()));
         monthlyChargeInVat = RANDOM.nextInt(200) - 100;
         lifeTime = RANDOM.nextInt(24) == 0 ? 0 : RANDOM.nextInt(24) + 1;
+        action = getRandomAction();
     }
 
     public String getName() {
@@ -37,29 +39,40 @@ public class Product extends Document {
         return monthlyDiscount;
     }
 
+    public ServiceClass getServiceClass() {
+        return serviceClass;
+    }
+
     public Product(ServiceClass... serviceClasses) {
-        for (ServiceClass serviceClass : serviceClasses) {
-            this.serviceClass = serviceClass;
-            switch (serviceClass) {
-                case DISCOUNT:
-                    name = DISCOUNT_SERVICE_NAMES.get(RANDOM.nextInt(DISCOUNT_SERVICE_NAMES.size()));
-                    monthlyChargeInVat = -RANDOM.nextInt(100);
-                    lifeTime = monthlyChargeInVat = -RANDOM.nextInt(100);
-                    break;
-                case HARDWARE:
-                    name = HARDWARE.get(RANDOM.nextInt(HARDWARE.size()));
-                    monthlyChargeInVat = RANDOM.nextInt(100) + 1;
-                    break;
-                case SERVICE:
-                    name = SERVICE_NAMES.get(RANDOM.nextInt(SERVICE_NAMES.size()));
-                    monthlyChargeInVat = RANDOM.nextInt(100) + 1;
-                    lifeTime = 0;
-                    break;
-                default:
-                    throw new IllegalArgumentException("Unsupported ServiceClass: " + serviceClass);
-            }
+        if (serviceClasses.length == 0) {
+            throw new IllegalArgumentException("At least one ServiceClass must be provided.");
+        }
+        ServiceClass selectedServiceClass = serviceClasses[RANDOM.nextInt(serviceClasses.length)];
+        this.serviceClass = selectedServiceClass;
+
+        switch (selectedServiceClass) {
+            case DISCOUNT:
+                name = DISCOUNT_SERVICE_NAMES.get(RANDOM.nextInt(DISCOUNT_SERVICE_NAMES.size()));
+                monthlyChargeInVat = -RANDOM.nextInt(99) - 1;
+                lifeTime = RANDOM.nextInt(13);
+                action = ProductAction.ADD;
+                break;
+            case HARDWARE:
+                name = HARDWARE.get(RANDOM.nextInt(HARDWARE.size()));
+                monthlyChargeInVat = RANDOM.nextInt(100) + 1;
+                action = ProductAction.ADD;
+                break;
+            case SERVICE:
+                name = SERVICE_NAMES.get(RANDOM.nextInt(SERVICE_NAMES.size()));
+                monthlyChargeInVat = RANDOM.nextInt(100) + 1;
+                lifeTime = 0;
+                action = ProductAction.ADD;
+                break;
+            default:
+                throw new IllegalArgumentException("Unsupported ServiceClass: " + selectedServiceClass);
         }
     }
+
 
     public Object getAttributeValue(String attributeName) {
         switch (attributeName) {
@@ -89,7 +102,7 @@ public class Product extends Document {
         if ("name".equals(attributeName)) {
             return name;
         } else if ("action".equals(attributeName)) {
-            return getRandomAction().toString();
+            return action.toString();
         } else if ("monthlyCharge.inVat".equals(attributeName) || "product.monthlyCharge.inVat".equals(attributeName)) {
             return monthlyChargeInVat;
         } else if ("lifetimeInMonths".equals(attributeName)) {
@@ -103,7 +116,7 @@ public class Product extends Document {
         } else if ("customerRelevant".equals(attributeName)) {
             return RANDOM.nextBoolean() ? "true" : "false";
         } else if ("insuranceClass".equals(attributeName)) {
-            return "SWITCH";
+            return "XL";
         } else if ("category".equals(attributeName)) {
             // You could decide "GENERAL" for product vs. "ADDON" for service, etc.
             return RANDOM.nextBoolean() ? "GENERAL" : "ADDON";

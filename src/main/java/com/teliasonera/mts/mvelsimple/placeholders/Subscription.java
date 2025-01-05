@@ -57,7 +57,7 @@ public class Subscription extends Document {
             case "services":
                 List<IPlaceholder> serviceList = new ArrayList<>();
                 for (int i = 0; i < RANDOM.nextInt(100) + 10; i++) {
-                    serviceList.add(new Product(ServiceClass.SERVICE, ServiceClass.DISCOUNT));
+                    serviceList.add(new Product( ServiceClass.DISCOUNT, ServiceClass.SERVICE));
                 }
                 return serviceList;
         }

@@ -85,6 +85,8 @@ public class Document implements IPlaceholder {
                 return RANDOM.nextBoolean() ? "true" : "false";
             case "product.disclaimers":
                 return "product.disclaimers";
+            case "legal.signature":
+                return "legal.signature";
             case "user.communicationLevel":
                 return new String[]{"NoTelemarketingCommunication", "NoEmailTelemarketingCommunication", "NoCommunication", "NoSMS_MMS_Communication", "NoSMS_MMS_TelemarketingCommunication", "AllCommunication", "NoEmailCommunication", "NoEmail_SMS_MMS_Communication", "NoEmail_SMS_MMS_TelemarketingCommunication"}[new Random().nextInt(9)];
 
@@ -114,7 +116,7 @@ public class Document implements IPlaceholder {
             case "services":
                 List<IPlaceholder> serviceList = new ArrayList<>();
                 for (int i = 0; i < RANDOM.nextInt(100) + 10; i++) {
-                    serviceList.add(new Product(ServiceClass.SERVICE, ServiceClass.DISCOUNT));
+                    serviceList.add(new Product(ServiceClass.DISCOUNT , ServiceClass.SERVICE ));
                 }
                 return serviceList;
         }
